@@ -17,7 +17,7 @@ export default async function createGoveeClient(interfaceName?: string) {
   }
 
   if (networkAddresses.length === 0) {
-    throw new Error('Could not disver network address')
+    throw new Error('Could not discover network address')
   }
 
   const sockets = networkAddresses.map(networkAddress => new GoveeSocket(networkAddress))
