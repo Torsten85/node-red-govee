@@ -1,5 +1,5 @@
 {
-  "name": "node-red-govee",
+  "name": "@torsten85/node-red-govee",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -46,5 +46,8 @@
   "dependencies": {
     "color-convert": "^2.0.1",
     "zod": "^3.21.4"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   }
 }
