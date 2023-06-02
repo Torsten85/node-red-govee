@@ -1,4 +1,3 @@
-import '@total-typescript/ts-reset'
 import type { NetworkInterfaceInfo } from 'os'
 import { networkInterfaces } from 'os'
 
