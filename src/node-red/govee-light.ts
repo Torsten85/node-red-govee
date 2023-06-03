@@ -43,9 +43,7 @@ export default function GoveeLightRegistration(RED: any) {
       return
     }
 
-    const devicePromise = getClient().then(client => client.getDevice(config.deviceid!))
-
-    const getDevice = () => devicePromise
+    const getDevice = () => getClient().then(client => client.getDevice(config.deviceid!))
 
     getDevice().then(device => {
       device?.on('updated', () => {

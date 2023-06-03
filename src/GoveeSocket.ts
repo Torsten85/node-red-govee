@@ -95,6 +95,9 @@ export default class GoveeSocket extends EventEmitter {
         case 'scan': {
           if (this.devices.has(data.device)) {
             const deviceEntry = this.devices.get(data.device)!
+            if (deviceEntry.device.ip !== data.ip) {
+              console.info(`Device ${data.device} switched ip from ${deviceEntry.device.ip} to ${data.ip}`)
+            }
             deviceEntry.device.updateConfig(data, (c, d) => this.send(c, d, data.ip))
             deviceEntry.lastSeen = Date.now()
           } else {

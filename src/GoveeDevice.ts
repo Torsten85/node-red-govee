@@ -17,6 +17,7 @@ type Status = DeviceStatusResponse['data']
 export default class GoveeDevice extends EventEmitter {
   private config: Config
   private status?: Status
+  private targetStatus: Partial<Status> = {}
   private initPromise: Promise<void>
   private resolveInitPromise!: () => void
 
@@ -48,7 +49,33 @@ export default class GoveeDevice extends EventEmitter {
       this.status?.color.g !== status.color.g ||
       this.status?.color.b !== status.color.b
 
+    const target = this.targetStatus
     this.status = status
+
+    if (status.onOff === target.onOff) {
+      delete target.onOff
+    } else if ('onOff' in target) {
+      this.setPower(Boolean(target.onOff))
+    }
+
+    if (status.brightness === target.brightness) {
+      delete target.brightness
+    } else if ('brightness' in target) {
+      this.setBrightness(target.brightness!)
+    }
+
+    if (status.colorTemInKelvin === target.colorTemInKelvin) {
+      delete target.colorTemInKelvin
+    } else if ('colorTemInKelvin' in target) {
+      this.setKelvin(target.colorTemInKelvin!)
+    }
+
+    if (status.color === target.color) {
+      delete target.color
+    } else if ('color' in target) {
+      this.setRGB([target.color!.r, target.color!.g, target.color!.b])
+    }
+
     this.resolveInitPromise()
     if (hasChanges) {
       this.emit('updated')
@@ -93,22 +120,22 @@ export default class GoveeDevice extends EventEmitter {
   }
 
   public setPower(power: boolean) {
-    return this.send('turn', { value: power ? 1 : 0 })
-  }
-
-  public powerToggle() {
-    return this.send('turn', { value: this.status?.onOff === 1 ? 0 : 1 })
+    const onOff = power ? 1 : 0
+    this.targetStatus.onOff = power ? 1 : 0
+    return this.send('turn', { value: onOff })
   }
 
   public async setBrightness(value: z.infer<typeof brightnessRangeSchema>) {
     const brightness = brightnessRangeSchema.parse(value)
+    this.targetStatus.brightness = brightness
     return this.send('brightness', { value: brightness })
   }
 
   public async setKelvin(value: z.infer<typeof kelvinSchema>) {
-    const kelvin = kelvinSchema.parse(value)
+    const colorTemInKelvin = kelvinSchema.parse(value)
+    this.targetStatus.colorTemInKelvin = colorTemInKelvin
     return this.send('colorwc', {
-      colorTemInKelvin: kelvin,
+      colorTemInKelvin,
     })
   }
 
@@ -119,6 +146,7 @@ export default class GoveeDevice extends EventEmitter {
     }
 
     const rgb = { r: color[0], g: color[1], b: color[2] }
+    this.targetStatus.color = rgb
     return this.send('colorwc', {
       color: rgb,
     })
