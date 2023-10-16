@@ -2,7 +2,7 @@ import type { Handler } from 'express'
 import type { Node } from 'node-red'
 import * as z from 'zod'
 
-import { addGoveeDevice, getClient, removeGoveeDevice } from './goveeClientManager'
+import getClient from './goveeClientManager'
 
 const booleanInputSchema = z.boolean()
 
@@ -35,7 +35,6 @@ export default function GoveeLightRegistration(RED: any) {
   RED.httpAdmin.get('/govee/lights', lightsHandler)
 
   function GoveeLight(this: Node, config: { deviceid?: string }) {
-    addGoveeDevice()
     RED.nodes.createNode(this, config)
 
     if (!config.deviceid) {
@@ -98,10 +97,6 @@ export default function GoveeLightRegistration(RED: any) {
         }
         done(error)
       }
-    })
-
-    this.on('close', () => {
-      removeGoveeDevice()
     })
   }
 
