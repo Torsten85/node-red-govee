@@ -1,0 +1,65 @@
+<script type="text/x-red" data-template-name="govee-light">
+  <div class="form-row">
+    <label for="node-input-deviceid"><i class="fa fa-lightbulb-o"></i> <span data-i18n="govee-light.config.deviceid"></span></label>
+    <div style="display: inline-flex; width: calc(100% - 105px)">
+        <div id="input-select-toggle" style="flex-grow: 1;">
+            <input type="text" id="node-input-deviceid" placeholder="00000000-0000-0000-0000-000000000000" style="width: 100%"/>
+        </div>
+        <button id="node-config-input-scan-devices" type="button" class="red-ui-button" style="margin-left: 10px;">
+            <i class="fa fa-search"></i>
+        </button>
+    </div>
+</div>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType('govee-light', {
+    category: 'Govee',
+    color: 'white',
+    icon: 'govee.png',
+    defaults: {
+      deviceid: {
+        value: '',
+        required: true,
+        validate: RED.validators.regex(/^([0-9A-F]{2}[:]){7}([0-9A-F]{2})$/)
+      }
+    },
+    align: 'left',
+    inputs: 1,
+    outputs: 1,
+    label() {
+      return this.name || this._('govee-light.node.title')
+    },
+    paletteLabel() {
+      return this._('govee-light.node.title')
+    },
+    inputLabels() {
+      return this._('govee-light.node.input')
+    },
+    outputLabels() {
+      return this._('govee-light.node.output')
+    },
+    oneditprepare() {
+      $('#node-config-input-scan-devices').click(() => {
+        const notification = RED.notify(this._('govee-light.config.searching', { type: 'compact', modal: true, fixed: true }))
+        const currentId = $('#node-input-deviceid').val()
+        $.get('/govee/lights')
+        .done(data => {
+          const devices = JSON.parse(data)
+          $('#node-input-deviceid').typedInput({
+            types: [
+              {
+                value: currentId,
+                options: devices.map(device => ({
+                  value: device.id,
+                  label: `${device.sku} (${device.ip})`
+                }))
+              },
+            ]
+          })
+          notification.close()
+        })
+      })
+    }
+  })
+</script>
