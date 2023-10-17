@@ -73,7 +73,7 @@ var objectInputSchema = z.object({
         z.tuple([z.number().int().min(0).max(255), z.number().int().min(0).max(255), z.number().int().min(0).max(255)]),
     ])
         .optional(),
-    hsl: z.tuple([z.number().int().min(0).max(255), z.number().int().min(0).max(255), z.number().int().min(0).max(255)]).optional(),
+    hsl: z.tuple([z.number().int().min(0).max(360), z.number().int().min(0).max(255), z.number().int().min(0).max(255)]).optional(),
     kelvin: z.number().int().min(2000).max(9000).optional(),
     brightness: z.number().int().min(0).max(100).optional(),
 });
